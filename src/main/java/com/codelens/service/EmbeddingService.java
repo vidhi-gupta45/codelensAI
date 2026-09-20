@@ -29,7 +29,7 @@ public class EmbeddingService {
     public void embedCodeChunks(RepoAnalysis repoAnalysis) {
         log.info("Generating vector embeddings for repo analysis {}", repoAnalysis.getId());
 
-        List<CodeChunk> chunks = codeChunkRepository.findByRepoAnalysisId(repoAnalysis.getId());
+        List<CodeChunk> chunks = codeChunkRepository.findByRepoAnalysisIdWithFileNode(repoAnalysis.getId());
         if (chunks.isEmpty()) {
             log.warn("No code chunks found to embed for repo analysis {}", repoAnalysis.getId());
             return;

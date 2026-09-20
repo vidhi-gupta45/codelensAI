@@ -1,6 +1,7 @@
 package com.codelens.entity;
 
 import com.codelens.entity.enums.AnalysisStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,10 +48,12 @@ public class RepoAnalysis {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @Column(name = "repo_url", nullable = false)
@@ -86,18 +89,22 @@ public class RepoAnalysis {
 
     @OneToMany(mappedBy = "repoAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<AnalysisJob> jobs = new ArrayList<>();
 
     @OneToMany(mappedBy = "repoAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<FileNode> files = new ArrayList<>();
 
     @OneToMany(mappedBy = "repoAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<CodeChunk> chunks = new ArrayList<>();
 
     @OneToMany(mappedBy = "repoAnalysis", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<QAHistory> qaHistories = new ArrayList<>();
 
     @Override

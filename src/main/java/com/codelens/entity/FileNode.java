@@ -1,5 +1,6 @@
 package com.codelens.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,10 +44,12 @@ public class FileNode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "repo_analysis_id", nullable = false)
+    @JsonIgnore
     private RepoAnalysis repoAnalysis;
 
     @Column(name = "path", nullable = false, length = 1000)
@@ -73,6 +76,7 @@ public class FileNode {
 
     @OneToMany(mappedBy = "fileNode", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<CodeChunk> chunks = new ArrayList<>();
 
     @Override

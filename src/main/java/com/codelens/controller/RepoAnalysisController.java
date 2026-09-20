@@ -65,7 +65,7 @@ public class RepoAnalysisController {
                         .build());
 
         repoAnalysis.setStatus(AnalysisStatus.PROCESSING);
-        repoAnalysis = repoAnalysisRepository.save(repoAnalysis);
+        repoAnalysis = repoAnalysisRepository.saveAndFlush(repoAnalysis);
 
         AnalysisJob job = AnalysisJob.builder()
                 .repoAnalysis(repoAnalysis)
@@ -74,7 +74,7 @@ public class RepoAnalysisController {
                 .currentStage("Queued")
                 .build();
 
-        job = analysisJobRepository.save(job);
+        job = analysisJobRepository.saveAndFlush(job);
 
         log.info("Queued analysis job {} for repo {} (User: {})", job.getId(), repoUrl, user.getEmail());
 
@@ -98,6 +98,7 @@ public class RepoAnalysisController {
         return ResponseEntity.ok(job);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     @GetMapping("/{repoId}")
     public ResponseEntity<Map<String, Object>> getRepoAnalysis(@PathVariable UUID repoId) {
         User user = getAuthenticatedUser();
@@ -123,6 +124,7 @@ public class RepoAnalysisController {
         return ResponseEntity.ok(result);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     @GetMapping("/{repoId}/architecture")
     public ResponseEntity<ArchitectureResponse> getArchitectureView(@PathVariable UUID repoId) {
         User user = getAuthenticatedUser();

@@ -154,8 +154,10 @@ public class CodeParserService {
             entryPoints.add(relativePath + " (Java Main)");
         } else if (lowerPath.endsWith("index.js") || lowerPath.endsWith("index.ts") || lowerPath.endsWith("server.js") || lowerPath.endsWith("app.js")) {
             entryPoints.add(relativePath + " (Node/JS Entry)");
-        } else if (lowerPath.endsWith("main.py") || content.contains("if __name__ == '__main__':") || content.contains("if __name__ == \"__main__\":")) {
-            entryPoints.add(relativePath + " (Python Main)");
+        } else if (lowerPath.endsWith("main.py") || lowerPath.endsWith("app.py") || lowerPath.endsWith("run.py") || lowerPath.endsWith("manage.py") ||
+                content.contains("if __name__ == '__main__':") || content.contains("if __name__ == \"__main__\":") ||
+                content.contains("FastAPI(") || content.contains("Flask(")) {
+            entryPoints.add(relativePath + " (Python Entry)");
         } else if (lowerPath.endsWith("main.go") || (content.contains("package main") && content.contains("func main()"))) {
             entryPoints.add(relativePath + " (Go Main)");
         } else if (lowerPath.endsWith("app.tsx") || lowerPath.endsWith("app.jsx")) {
@@ -166,16 +168,17 @@ public class CodeParserService {
     private void detectLayers(String relativePath, String content, Map<String, List<String>> layers) {
         String lowerPath = relativePath.toLowerCase();
 
-        if (lowerPath.contains("controller") || lowerPath.contains("routes") || lowerPath.contains("api") ||
-                content.contains("@RestController") || content.contains("@Controller")) {
+        if (lowerPath.contains("controller") || lowerPath.contains("routes") || lowerPath.contains("api") || lowerPath.contains("views") || lowerPath.contains("endpoints") ||
+                content.contains("@RestController") || content.contains("@Controller") || content.contains("@app.get") || content.contains("@app.post") || content.contains("@router")) {
             layers.get("API Layer").add(relativePath);
-        } else if (lowerPath.contains("service") || lowerPath.contains("usecase") || content.contains("@Service")) {
+        } else if (lowerPath.contains("service") || lowerPath.contains("usecase") || lowerPath.contains("handler") || lowerPath.contains("processor") || lowerPath.contains("pipeline") ||
+                content.contains("@Service")) {
             layers.get("Business Logic Layer").add(relativePath);
-        } else if (lowerPath.contains("repository") || lowerPath.contains("dao") || content.contains("@Repository")) {
+        } else if (lowerPath.contains("repository") || lowerPath.contains("dao") || lowerPath.contains("db") || lowerPath.contains("crud") || content.contains("@Repository")) {
             layers.get("Data Access Layer").add(relativePath);
-        } else if (lowerPath.contains("entity") || lowerPath.contains("model") || lowerPath.contains("dto") || content.contains("@Entity")) {
+        } else if (lowerPath.contains("entity") || lowerPath.contains("model") || lowerPath.contains("dto") || lowerPath.contains("schema") || content.contains("@Entity") || content.contains("BaseModel")) {
             layers.get("Data Model Layer").add(relativePath);
-        } else if (lowerPath.contains("component") || lowerPath.contains("pages") || lowerPath.contains("views") || lowerPath.contains("src/ui")) {
+        } else if (lowerPath.contains("component") || lowerPath.contains("pages") || lowerPath.contains("templates") || lowerPath.contains("views") || lowerPath.contains("src/ui")) {
             layers.get("UI / Frontend Layer").add(relativePath);
         }
     }

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 import java.time.Instant;
@@ -35,7 +36,7 @@ public class AnalysisPipelineService {
     public void runPipelineAsync(UUID jobId) {
         log.info("Starting background analysis pipeline execution for job {}", jobId);
 
-        AnalysisJob job = analysisJobRepository.findById(jobId)
+        AnalysisJob job = analysisJobRepository.findByIdWithRepoAnalysis(jobId)
                 .orElseThrow(() -> new IllegalArgumentException("Analysis job not found: " + jobId));
 
         RepoAnalysis repoAnalysis = job.getRepoAnalysis();
@@ -49,7 +50,7 @@ public class AnalysisPipelineService {
             // ----------------------------------------------------
             updateJobState(job, JobStatus.CLONING, 10, "Cloning Repository", "Cloning repository from GitHub...");
             repoAnalysis.setStatus(AnalysisStatus.PROCESSING);
-            repoAnalysisRepository.save(repoAnalysis);
+            repoAnalysisRepository.saveAndFlush(repoAnalysis);
 
             GitCloneService.GitCloneResult cloneResult = gitCloneService.cloneRepository(repoAnalysis.getRepoUrl(), jobId);
             tempDir = cloneResult.getTempDir();
@@ -95,10 +96,10 @@ public class AnalysisPipelineService {
             job.setErrorMessage(e.getMessage());
             job.setStatus(JobStatus.FAILED);
             job.setCurrentStage("Failed");
-            analysisJobRepository.save(job);
+            analysisJobRepository.saveAndFlush(job);
 
             repoAnalysis.setStatus(AnalysisStatus.FAILED);
-            repoAnalysisRepository.save(repoAnalysis);
+            repoAnalysisRepository.saveAndFlush(repoAnalysis);
 
             webSocketNotificationService.notifyJobProgress(job, "Failed", "Analysis failed: " + e.getMessage(), e.getMessage());
 
@@ -113,7 +114,7 @@ public class AnalysisPipelineService {
         job.setStatus(status);
         job.setProgress(progress);
         job.setCurrentStage(stage);
-        analysisJobRepository.save(job);
+        analysisJobRepository.saveAndFlush(job);
 
         webSocketNotificationService.notifyJobProgress(job, stage, message);
     }

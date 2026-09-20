@@ -79,7 +79,7 @@ public class GitCloneService {
                 .setDepth(1)
                 .call()) {
 
-            log.info("Repository cloned successfully into {}", workDir);
+            log.info("Repository cloned successfully into {}", workDir); // debugging purpose
         } catch (GitAPIException e) {
             cleanupTempDir(workDir);
             throw new IllegalArgumentException("Failed to clone repository from " + repoUrl + ": " + e.getMessage(), e);

@@ -7,10 +7,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,6 +41,22 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("error", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatchException(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        
+        String propertyName = ex.getName();
+        if (ex.getRequiredType() != null && ex.getRequiredType().equals(UUID.class)) {
+            body.put("error", "Invalid UUID format for parameter '" + propertyName + "'. Please ensure there are no quotes or extra spaces.");
+        } else {
+            body.put("error", "Invalid value for parameter '" + propertyName + "'");
+        }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }

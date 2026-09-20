@@ -1,6 +1,8 @@
 package com.codelens.entity;
 
 import com.codelens.entity.enums.JobStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -43,11 +45,23 @@ public class AnalysisJob {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "repo_analysis_id", nullable = false)
+    @JsonIgnore
     private RepoAnalysis repoAnalysis;
+
+    @JsonProperty("repoId")
+    public UUID getRepoId() {
+        return repoAnalysis != null ? repoAnalysis.getId() : null;
+    }
+
+    @JsonProperty("progressPercentage")
+    public Integer getProgressPercentage() {
+        return progress;
+    }
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 50)

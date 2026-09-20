@@ -136,7 +136,7 @@ public class RAGQueryService {
             answer = chatModel.call(prompt).getResult().getOutput().getText();
         } catch (Exception e) {
             log.error("Groq LLM call failed during RAG Q&A: {}", e.getMessage(), e);
-            answer = "I'm sorry, I could not generate an answer at this time due to an AI service error: " + e.getMessage();
+            throw new RuntimeException("AI service error during Q&A: " + e.getMessage(), e);
         }
 
         // Remove duplicate citations while preserving order

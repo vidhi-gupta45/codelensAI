@@ -1,6 +1,7 @@
 package com.codelens.entity;
 
 import com.codelens.entity.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,16 +25,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(
-    name = "users",
-    indexes = {
+@Table(name = "users", indexes = {
         @Index(name = "idx_users_email", columnList = "email", unique = true)
-    }
-)
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -44,12 +41,14 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
     private UUID id;
 
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
     @Column(name = "password", nullable = false)
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -67,12 +66,15 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @JsonIgnore
     private List<RepoAnalysis> repoAnalyses = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User other)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof User other))
+            return false;
         return id != null && id.equals(other.id);
     }
 
