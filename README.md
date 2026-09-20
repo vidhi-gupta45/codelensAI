@@ -9,8 +9,4 @@ AI-powered GitHub repository analyzer. Submit any public GitHub URL and get an i
 - Redis (Upstash)
 - React (coming soon)
 
-## Status
-🚧 In active development — backend complete, frontend in progress
 
-## Setup
-Coming soon
